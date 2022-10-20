@@ -1,4 +1,4 @@
-![pipeline](https://github.com/atrapalo/go-base/actions/workflows/go.yml/badge.svg)
+![pipeline](https://github.com/atrapalo/go-base/actions/workflows/test.yml/badge.svg)
 
 # go-base
 
