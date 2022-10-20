@@ -1,4 +1,4 @@
-module gitlab.atrapalo.com/accommodations/go-base
+module github.com/atrapalo/go-base
 
 go 1.18
 
