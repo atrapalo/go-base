@@ -7,7 +7,7 @@ require (
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/newrelic/go-agent/v3 v3.19.2
 	github.com/newrelic/go-agent/v3/integrations/nrecho-v4 v1.0.3
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
 	github.com/webguerilla/ftps v0.0.0-20180713194618-60e520f5feed
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 )
@@ -30,5 +30,5 @@ require (
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.49.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
