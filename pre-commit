@@ -1,0 +1,81 @@
+#!/bin/sh
+
+green='\033[1;92m'
+yellow='\033[0;93m'
+red='\033[0;31m'
+colorOff='\033[0m'
+
+echo "\n~~~~~~~~~~ PRECOMMIT rules ~~~~~~~~~~"
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    against=717f93f7c939d681d08edf5e98b54b3812daf11e
+fi
+
+# If you want to allow non-ASCII filenames set this variable to true.
+allownonascii=$(git config --bool hooks.allownonascii)
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Cross platform projects tend to avoid non-ASCII filenames; prevent
+# them from being added to the repository. We exploit the fact that the
+# printable range starts at the space character and ends with tilde.
+if [ "$allownonascii" != "true" ] &&
+# Note that the use of brackets around a tr range is ok here, (it's
+# even required, for portability to Solaris 10's /usr/bin/tr), since
+# the square bracket bytes happen to fall in the designated range.
+test $(git diff --cached --name-only --diff-filter=A -z $against |
+LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
+then
+cat <<\EOF
+Error: Attempt to add a non-ASCII file name.
+This can cause problems if you want to work with people on other platforms.
+To be portable it is advisable to rename the file.
+If you know what you are doing you can disable this check using:
+git config hooks.allownonascii true
+EOF
+    exit 1
+fi
+
+echo "\n${yellow}-- Go files format --${colorOff}\n"
+gofiles=$(git diff --cached --name-only HEAD --diff-filter=ACMT | grep '\.go$')
+if [ -z "$gofiles" ]
+then
+    echo "No Go files in cached commit\n"
+    exit 0
+fi
+
+unformatted=$(gofmt -l $gofiles)
+if ! [ -z "$unformatted" ]
+then
+    echo "${red}You are committing the following unformatted files:${colorOff}"
+    for fn in $unformatted; do
+        gofmt -l $PWD/$fn
+    done
+    echo "\nPlease run gofmt -w to each one of the listed files above.\n"
+    exit 1
+fi
+echo "${green}OK${colorOff}"
+
+echo "\n${yellow}-- Go files vet check --${colorOff}\n"
+failVet=$(go vet -composites=false ./...) 1>&2
+if [ $? -ne 0 ]
+then
+    echo "${failVet}\n"
+    echo "${red}KO${colorOff}\n"
+    exit 1
+fi
+echo "${green}OK${colorOff}"
+
+echo "\n${yellow}-- Running unit tests --${colorOff}\n"
+go test ./...
+if [ $? -ne 0 ]
+then
+    echo "\n${red}ಠ_ಠ Dude! What are you doing? Fix the unit tests!${colorOff}\n"
+    exit 1
+fi
+echo "\n${green}OK${colorOff}\n"
+exit 0

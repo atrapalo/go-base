@@ -1,0 +1,5 @@
+.vscode
+.idea/*
+debug
+vendor/*
+*.DS_Store
