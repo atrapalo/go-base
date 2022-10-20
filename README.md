@@ -1,3 +1,5 @@
+![pipeline](https://github.com/atrapalo/go-base/actions/workflows/go.yml/badge.svg)
+
 # go-base
 
 Project base to use as a vendor in new GO projects
