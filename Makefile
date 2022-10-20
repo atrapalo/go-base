@@ -5,14 +5,14 @@ all: help
 ## Available commands:
 ##
 
-.PHONY: help setup up stop pull down logs shell test build
+.PHONY: help vendor up stop pull down logs shell test build
 
 help: Makefile
 	@sed -n 's/^##//p' $<
 
-## setup:       Setup
-setup:
-	go mod vendor && ln -sf ../../pre-commit .git/hooks/pre-commit
+## vendor:      Vendor
+vendor:
+	go mod tidy && go mod vendor && go mod tidy && ln -sf ../../pre-commit .git/hooks/pre-commit
 
 ## unit:        Run unit tests
 unit:

@@ -1,8 +1,8 @@
 package environment_test
 
 import (
+	"github.com/atrapalo/go-base/environment"
 	"github.com/stretchr/testify/assert"
-	"gitlab.atrapalo.com/accommodations/go-base/environment"
 	"testing"
 )
 

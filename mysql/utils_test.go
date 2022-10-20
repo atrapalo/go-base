@@ -1,8 +1,8 @@
 package mysql_test
 
 import (
+	"github.com/atrapalo/go-base/mysql"
 	"github.com/stretchr/testify/assert"
-	"gitlab.atrapalo.com/accommodations/go-base/mysql"
 	"regexp"
 	"testing"
 )

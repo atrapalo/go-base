@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"gitlab.atrapalo.com/accommodations/go-base/application"
+	"github.com/atrapalo/go-base/application"
 )
 
 func DefineRoutes(app *application.Application) {

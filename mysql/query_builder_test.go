@@ -2,8 +2,8 @@ package mysql_test
 
 import (
 	"fmt"
+	"github.com/atrapalo/go-base/mysql"
 	"github.com/stretchr/testify/assert"
-	"gitlab.atrapalo.com/accommodations/go-base/mysql"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"testing"
 )
