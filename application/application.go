@@ -1,4 +1,4 @@
-package engine
+package application
 
 import (
 	"github.com/labstack/echo/v4"
@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-type Engine struct {
+type Application struct {
 	*echo.Echo
 	debug      bool
 	port       string
@@ -17,8 +17,8 @@ type Engine struct {
 	useSSL     bool
 }
 
-func New(debug bool, port string, silentMode bool, useSSL bool, newRelicApp *newrelic.Application) *Engine {
-	engine := &Engine{
+func New(debug bool, port string, silentMode bool, useSSL bool, newRelicApp *newrelic.Application) *Application {
+	app := &Application{
 		echo.New(),
 		debug,
 		port,
@@ -26,34 +26,34 @@ func New(debug bool, port string, silentMode bool, useSSL bool, newRelicApp *new
 		useSSL,
 	}
 
-	engine.Debug = debug
-	engine.HideBanner = true
+	app.Debug = debug
+	app.HideBanner = true
 
 	if newRelicApp != nil {
 		skipperConfig := nrecho.WithSkipper(requestedPathMustNotBeMonitored)
-		engine.Use(nrecho.Middleware(newRelicApp, skipperConfig))
+		app.Use(nrecho.Middleware(newRelicApp, skipperConfig))
 	}
 
-	engine.Use(customContextMiddleware(engine))
-	engine.Use(middleware.RequestID())
-	engine.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	app.Use(customContextMiddleware(app))
+	app.Use(middleware.RequestID())
+	app.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5,
 	}))
-	engine.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+	app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Skipper: func(c echo.Context) bool {
 			return mustDisableAccessLog(c, silentMode)
 		},
 		Format: "method=${method}, uri=${uri}, status=${status}\n",
 	}))
-	engine.Use(middleware.Recover())
+	app.Use(middleware.Recover())
 
-	engine.Static("/", engine.getDir()+"/swagger-ui").Name = "swagger-static"
-	engine.File("/swagger", engine.getDir()+"/swagger.yaml").Name = "swagger-file"
+	app.Static("/", app.getDir()+"/swagger-ui").Name = "swagger-static"
+	app.File("/swagger", app.getDir()+"/swagger.yaml").Name = "swagger-file"
 
-	return engine
+	return app
 }
 
-func (a *Engine) Start() {
+func (a *Application) Start() {
 	if a.useSSL {
 		a.startSSL()
 	}
@@ -61,13 +61,13 @@ func (a *Engine) Start() {
 	a.Logger.Fatal(a.Echo.Start(":" + a.port))
 }
 
-func (a *Engine) startSSL() {
+func (a *Application) startSSL() {
 	go func() {
 		a.Logger.Fatal(a.Echo.StartTLS(":443", a.getDir()+"/ssl/cert.pem", a.getDir()+"/ssl/key.pem"))
 	}()
 }
 
-func (a *Engine) getDir() string {
+func (a *Application) getDir() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		a.Logger.Error(err)
@@ -77,10 +77,10 @@ func (a *Engine) getDir() string {
 	return dir
 }
 
-func customContextMiddleware(engine *Engine) echo.MiddlewareFunc {
+func customContextMiddleware(app *Application) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := NewCustomContext(engine, c)
+			cc := NewCustomContext(app, c)
 			return next(cc)
 		}
 	}

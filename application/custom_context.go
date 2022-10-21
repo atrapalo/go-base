@@ -1,19 +1,19 @@
-package engine
+package application
 
 import "github.com/labstack/echo/v4"
 
 type CustomContext struct {
 	echo.Context
-	*Engine
+	*Application
 }
 
-func NewCustomContext(engine *Engine, c echo.Context) *CustomContext {
+func NewCustomContext(app *Application, c echo.Context) *CustomContext {
 	return &CustomContext{
 		c,
-		engine,
+		app,
 	}
 }
 
 func (c *CustomContext) Echo() *echo.Echo {
-	return c.Engine.Echo
+	return c.Application.Echo
 }
